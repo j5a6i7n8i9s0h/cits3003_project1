@@ -367,8 +367,12 @@ void display( void )
 
     // Set the view matrix. To start with this just moves the camera
     // backwards.  You'll need to add appropriate rotations.
+    
+    //implements rotation around point in scene 
+    mat4 rotateCamera = RotateX(camRotUpAndOverDeg)*RotateY(camRotSidewaysDeg);
+    view = Translate(0.0, 0.0, -viewDist)*rotateCamera;
 
-    view = Translate(0.0, 0.0, -viewDist);
+    
 
     SceneObject lightObj1 = sceneObjs[1]; 
     vec4 lightPosition = view * lightObj1.loc ;
