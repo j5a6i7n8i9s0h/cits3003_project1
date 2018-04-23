@@ -395,8 +395,6 @@ void display( void )
 
         drawMesh(sceneObjs[i]);
     }
-
-    glutSwapBuffers();
 }
 
 //----------------------------------------------------------------------------
