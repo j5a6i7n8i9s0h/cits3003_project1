@@ -340,7 +340,7 @@ void drawMesh(SceneObject sceneObj)
     // in the sceneObj structure (see near the top of the program).
 
     mat4 model = Translate(sceneObj.loc) * Scale(sceneObj.scale);
-
+    model = model *RotateX(sceneObj.angles[0])*RotateY(sceneObj.angles[1])*RotateZ(sceneObj.angles[2]);
 
     // Set the model-view matrix for the shaders
     glUniformMatrix4fv( modelViewU, 1, GL_TRUE, view * model );
@@ -367,12 +367,8 @@ void display( void )
 
     // Set the view matrix. To start with this just moves the camera
     // backwards.  You'll need to add appropriate rotations.
-    
-    //implements rotation around point in scene 
-    mat4 rotateCamera = RotateX(camRotUpAndOverDeg)*RotateY(camRotSidewaysDeg);
-    view = Translate(0.0, 0.0, -viewDist)*rotateCamera;
 
-    
+    view = Translate(0.0, 0.0, -viewDist)*RotateY(camRotSidewaysDeg)*RotateX(camRotUpAndOverDeg);
 
     SceneObject lightObj1 = sceneObjs[1]; 
     vec4 lightPosition = view * lightObj1.loc ;
@@ -588,16 +584,24 @@ void reshape( int width, int height )
     // You'll need to modify this so that the view is similar to that in the
     // sample solution.
     // In particular: 
-    //     - the view should include "closer" visible objects (slightly tricky)
+    //     - the view should include "closer" visible objects (slightly tricky) 
     //     - when the width is less than the height, the view should adjust so
     //         that the same part of the scene is visible across the width of
     //         the window.
 
-    GLfloat nearDist = 0.2;
-    projection = Frustum(-nearDist*(float)width/(float)height,
+    GLfloat nearDist = 0.05;
+    if(width > height){
+        projection = Frustum(-nearDist*(float)width/(float)height,
                          nearDist*(float)width/(float)height,
                          -nearDist, nearDist,
                          nearDist, 100.0);
+    }else{
+        projection = Frustum(-nearDist,nearDist,
+                         -nearDist*(float)height/(float)width,
+                         nearDist*(float)height/(float)width,
+                         nearDist, 100.0);
+    }
+    
 }
 
 //----------------------------------------------------------------------------
