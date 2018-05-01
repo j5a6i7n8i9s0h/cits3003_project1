@@ -370,7 +370,7 @@ void display( void )
     // Set the view matrix. To start with this just moves the camera
     // backwards.  You'll need to add appropriate rotations.
 
-    view = Translate(0.0, 0.0, -viewDist)*RotateY(camRotSidewaysDeg)*RotateX(camRotUpAndOverDeg);
+    view =  Translate(0.0, 0.0, -viewDist) * RotateX(camRotUpAndOverDeg)*RotateY(camRotSidewaysDeg);
 
     SceneObject lightObj1 = sceneObjs[1]; 
     vec4 lightPosition = view * lightObj1.loc ;
@@ -483,6 +483,7 @@ static int createArrayMenu(int size, const char menuEntries[][128], void(*menuFn
 }
 /*
     created adjust features  for light and ambiance 
+    possibly implment max/min ? 
 */
 static void adjustAmbientDiffuse(vec2 ad)
 {
@@ -491,7 +492,7 @@ static void adjustAmbientDiffuse(vec2 ad)
 
 static void adjustSpecularShine(vec2 as)
 {
-    sceneObjs[toolObj].specular+=as[0]; sceneObjs[toolObj].shine+=as[1];
+    sceneObjs[toolObj].specular+=as[0]; sceneObjs[toolObj].shine+=as[1]*10;
 }
 //
 static void materialMenu(int id)
