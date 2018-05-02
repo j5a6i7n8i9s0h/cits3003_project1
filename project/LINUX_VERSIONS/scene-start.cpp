@@ -18,6 +18,7 @@ GLint windowHeight=640, windowWidth=960;
 // to modify (but, you can).
 #include "gnatidread.h"
 
+
 using namespace std;        // Import the C++ standard functions (e.g., min) 
 
 
@@ -35,6 +36,7 @@ static float currentSide = 0;
 mat4 projection; // Projection matrix - set in the reshape function
 mat4 view; // View matrix - set in the display function.
 
+
 // These are used to set the window title
 char lab[] = "Project1";
 char *programName = NULL; // Set in main 
@@ -44,7 +46,7 @@ int numDisplayCalls = 0; // Used to calculate the number of frames per second
 // Uses the type aiMesh from ../../assimp--3.0.1270/include/assimp/mesh.h
 //                           (numMeshes is defined in gnatidread.h)
 aiMesh* meshes[numMeshes]; // For each mesh we have a pointer to the mesh to draw
-GLuint vaoIDs[numMeshes]; // and a corresponding VAO ID from glGenVertexArrays
+GLuint vaoIDs[numMeshes]; // and a corresponding aVAO ID from glGenVertexArrays
 
 // -----Textures--------------------------------------------------------------
 //                           (numTextures is defined in gnatidread.h)
@@ -483,7 +485,19 @@ static int createArrayMenu(int size, const char menuEntries[][128], void(*menuFn
     }
     return menuId;
 }
+/*
+    created adjust features  for light and ambiance 
+*/
+static void adjustAmbientDiffuse(vec2 ad)
+{
+    sceneObjs[toolObj].ambient+=ad[0]; sceneObjs[toolObj].diffuse+=ad[1];
+}
 
+static void adjustSpecularShine(vec2 as)
+{
+    sceneObjs[toolObj].specular+=as[0]; sceneObjs[toolObj].shine+=as[1];
+}
+//
 static void materialMenu(int id)
 {
     deactivateTool();
@@ -492,6 +506,13 @@ static void materialMenu(int id)
         toolObj = currObject;
         setToolCallbacks(adjustRedGreen, mat2(1, 0, 0, 1),
                          adjustBlueBrightness, mat2(1, 0, 0, 1) );
+    }
+    //Part C
+    else if(id==20)
+    {
+        toolObj = currObject;
+        setToolCallbacks(adjustAmbientDiffuse, mat2(1, 0, 0, 1),
+                         adjustSpecularShine, mat2(1, 0, 0, 1) );
     }
     // You'll need to fill in the remaining menu items here.                                                
     else {
@@ -534,7 +555,7 @@ static void makeMenu()
 
     int materialMenuId = glutCreateMenu(materialMenu);
     glutAddMenuEntry("R/G/B/All",10);
-    glutAddMenuEntry("UNIMPLEMENTED: Ambient/Diffuse/Specular/Shine",20);
+    glutAddMenuEntry("Ambient/Diffuse/Specular/Shine",20); // id for glutmenuentry // IMPLEMENTED C 
 
     int texMenuId = createArrayMenu(numTextures, textureMenuEntries, texMenu);
     int groundMenuId = createArrayMenu(numTextures, textureMenuEntries, groundMenu);
