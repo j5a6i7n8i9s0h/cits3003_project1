@@ -1,4 +1,4 @@
-
+//meme
 #include "Angel.h"
 
 #include <stdlib.h>
@@ -29,6 +29,8 @@ GLuint projectionU, modelViewU; // IDs for uniform variables (from glGetUniformL
 static float viewDist = 1.5; // Distance from the camera to the centre of the scene
 static float camRotSidewaysDeg=0; // rotates the camera sideways around the centre
 static float camRotUpAndOverDeg=20; // rotates the camera up and over the centre.
+static float currentUpDown = 20;
+static float currentSide = 0;
 
 mat4 projection; // Projection matrix - set in the reshape function
 mat4 view; // View matrix - set in the display function.
@@ -206,6 +208,7 @@ static void adjustCamrotsideViewdist(vec2 cv)
 
 static void adjustcamSideUp(vec2 su)
 {
+    cout << su << endl;
     camRotSidewaysDeg+=su[0]; camRotUpAndOverDeg+=su[1];
 }
     
@@ -369,7 +372,8 @@ void display( void )
     // backwards.  You'll need to add appropriate rotations.
 
     view = Translate(0.0, 0.0, -viewDist)*RotateY(camRotSidewaysDeg)*RotateX(camRotUpAndOverDeg);
-
+    currentUpDown = camRotUpAndOverDeg;
+    currentSide = camRotSidewaysDeg;
     SceneObject lightObj1 = sceneObjs[1]; 
     vec4 lightPosition = view * lightObj1.loc ;
 

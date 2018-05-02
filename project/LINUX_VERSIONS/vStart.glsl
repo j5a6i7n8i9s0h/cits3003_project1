@@ -18,9 +18,13 @@ void main()
     // Transform vertex position into eye coordinates
     vec3 pos = (ModelView * vpos).xyz;
 
-
-    // The vector to the light from the vertex    
+    // The vector to the light from the vertex
     vec3 Lvec = LightPosition.xyz - pos;
+
+    float distance = length(Lvec);
+    float lightRadius =5.0;
+    float distanceFactor = 1.0 - dot(Lvec/lightRadius, Lvec/lightRadius);
+    distanceFactor = max(0.0, distanceFactor);
 
     // Unit direction vectors for Blinn-Phong shading calculation
     vec3 L = normalize( Lvec );   // Direction to the light source
@@ -32,13 +36,14 @@ void main()
     vec3 N = normalize( (ModelView*vec4(vNormal, 0.0)).xyz );
 
     // Compute terms in the illumination equation
-    vec3 ambient = AmbientProduct;
+    vec3 ambient = AmbientProduct*distanceFactor;;
+    
 
     float Kd = max( dot(L, N), 0.0 );
-    vec3  diffuse = Kd*DiffuseProduct;
+    vec3  diffuse = Kd*DiffuseProduct* distanceFactor;
 
     float Ks = pow( max(dot(N, H), 0.0), Shininess );
-    vec3  specular = Ks * SpecularProduct;
+    vec3  specular = Ks * SpecularProduct * distanceFactor;
     
     if (dot(L, N) < 0.0 ) {
 	specular = vec3(0.0, 0.0, 0.0);
