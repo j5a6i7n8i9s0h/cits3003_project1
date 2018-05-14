@@ -3,7 +3,8 @@ attribute vec3 vNormal;
 attribute vec2 vTexCoord;
 
 varying vec2 texCoord;
-varying vec4 color;
+//varying vec4 color;
+varying vec3 pos;
 
 uniform vec3 AmbientProduct, DiffuseProduct, SpecularProduct;
 uniform mat4 ModelView;
@@ -11,16 +12,20 @@ uniform mat4 Projection;
 uniform vec4 LightPosition;
 uniform float Shininess;
 
+varying vec3 fN;
+varying vec3 fE;
+varying vec3 fL;
+
 void main()
 {
     vec4 vpos = vec4(vPosition, 1.0);
 
     // Transform vertex position into eye coordinates
-    vec3 pos = (ModelView * vpos).xyz;
+    pos = (ModelView * vpos).xyz;
 
     // The vector to the light from the vertex
+   /*
     vec3 Lvec = LightPosition.xyz - pos;
-
     float distance = length(Lvec);
     float lightRadius =5.0;
     float distanceFactor = 1.0 - dot(Lvec/lightRadius, Lvec/lightRadius);
@@ -36,7 +41,7 @@ void main()
     vec3 N = normalize( (ModelView*vec4(vNormal, 0.0)).xyz );
 
     // Compute terms in the illumination equation
-    vec3 ambient = AmbientProduct*distanceFactor;;
+    vec3 ambient = AmbientProduct*distanceFactor;
     
 
     float Kd = max( dot(L, N), 0.0 );
@@ -53,6 +58,10 @@ void main()
     vec3 globalAmbient = vec3(0.1, 0.1, 0.1);
     color.rgb = globalAmbient  + ambient + diffuse + specular;
     color.a = 1.0;
+    */
+    fN = (ModelView*vec4(vNormal,0.0)).xyz;
+    fE = -(ModelView*vpos).xyz;
+    fL = LightPosition.xyz - (ModelView*vpos).xyz;
 
     gl_Position = Projection * ModelView * vpos;
     texCoord = vTexCoord;

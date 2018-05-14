@@ -253,7 +253,7 @@ static void addObject(int id)
     sceneObjs[nObjects].rgb[2] = 0.7; sceneObjs[nObjects].brightness = 1.0;
 
     sceneObjs[nObjects].diffuse = 1.0; sceneObjs[nObjects].specular = 0.5;
-    sceneObjs[nObjects].ambient = 0.7; sceneObjs[nObjects].shine = 10.0;
+    sceneObjs[nObjects].ambient = 0.05; sceneObjs[nObjects].shine = 10.0;   /// ambient = 0.7
 
     sceneObjs[nObjects].angles[0] = 0.0; sceneObjs[nObjects].angles[1] = 180.0;
     sceneObjs[nObjects].angles[2] = 0.0;
