@@ -1,4 +1,3 @@
-
 #include "Angel.h"
 
 #include <stdlib.h>
@@ -26,14 +25,18 @@ using namespace std;        // Import the C++ standard functions (e.g., min)
 GLuint shaderProgram; // The number identifying the GLSL shader program
 GLuint vPosition, vNormal, vTexCoord; // IDs for vshader input vars (from glGetAttribLocation)
 GLuint projectionU, modelViewU; // IDs for uniform variables (from glGetUniformLocation)
+GLuint rippleEffectU;
+GLuint timeU;
 
 static float viewDist = 1.5; // Distance from the camera to the centre of the scene
 static float camRotSidewaysDeg=0; // rotates the camera sideways around the centre
 static float camRotUpAndOverDeg=20; // rotates the camera up and over the centre.
 
+
 mat4 projection; // Projection matrix - set in the reshape function
 mat4 view; // View matrix - set in the display function.
 
+bool rippleEffect = false; //to toggle ripple effect for question J
 
 // These are used to set the window title
 char lab[] = "Project1";
@@ -208,6 +211,7 @@ static void adjustCamrotsideViewdist(vec2 cv)
 
 static void adjustcamSideUp(vec2 su)
 {
+    //cout << su << endl;
     camRotSidewaysDeg+=su[0]; camRotUpAndOverDeg+=su[1];
 }
     
@@ -251,7 +255,7 @@ static void addObject(int id)
     sceneObjs[nObjects].rgb[2] = 0.7; sceneObjs[nObjects].brightness = 1.0;
 
     sceneObjs[nObjects].diffuse = 1.0; sceneObjs[nObjects].specular = 0.5;
-    sceneObjs[nObjects].ambient = 0.7; sceneObjs[nObjects].shine = 10.0;
+    sceneObjs[nObjects].ambient = 0.1; sceneObjs[nObjects].shine = 10.0;   /// ambient = 0.7
 
     sceneObjs[nObjects].angles[0] = 0.0; sceneObjs[nObjects].angles[1] = 180.0;
     sceneObjs[nObjects].angles[2] = 0.0;
@@ -294,6 +298,8 @@ void init( void )
 
     projectionU = glGetUniformLocation(shaderProgram, "Projection");
     modelViewU = glGetUniformLocation(shaderProgram, "ModelView");
+    rippleEffectU = glGetUniformLocation(shaderProgram, "RippleEffect");
+    timeU = glGetUniformLocation(shaderProgram, "time");
 
     // Objects 0, and 1 are the ground and the first light.
     addObject(0); // Square for the ground
@@ -337,7 +343,13 @@ void drawMesh(SceneObject sceneObj)
 
     // Set the projection matrix for the shaders
     glUniformMatrix4fv( projectionU, 1, GL_TRUE, projection );
-
+    glUniform1f(timeU, floor(glutGet(GLUT_ELAPSED_TIME)*0.05));
+    //cout << glutGet(GLUT_ELAPSED_TIME)*0.1 << endl ;
+    if(sceneObj.meshId == 0){
+        glUniform1i(rippleEffectU,rippleEffect);
+    }else{
+        glUniform1i(rippleEffectU, false);
+    }
     // Set the model matrix - this should combine translation, rotation and scaling based on what's
     // in the sceneObj structure (see near the top of the program).
 
@@ -543,6 +555,9 @@ static void mainmenu(int id)
         setToolCallbacks(adjustAngleYX, mat2(400, 0, 0, -400),
                          adjustAngleZTexscale, mat2(400, 0, 0, 15) );
     }
+    if(id == 7){
+        rippleEffect = !(rippleEffect);
+    }
     if (id == 99) exit(0);
 }
 
@@ -556,6 +571,7 @@ static void makeMenu()
 
     int texMenuId = createArrayMenu(numTextures, textureMenuEntries, texMenu);
     int groundMenuId = createArrayMenu(numTextures, textureMenuEntries, groundMenu);
+    //int currentObjectId = createArrayMenu(nObjects, )
 
     int lightMenuId = glutCreateMenu(lightMenu);
     glutAddMenuEntry("Move Light 1",70);
@@ -572,6 +588,7 @@ static void makeMenu()
     glutAddSubMenu("Texture",texMenuId);
     glutAddSubMenu("Ground Texture",groundMenuId);
     glutAddSubMenu("Lights",lightMenuId);
+    glutAddMenuEntry("Toggle Earthquake", 7);
     glutAddMenuEntry("EXIT", 99);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
