@@ -494,8 +494,7 @@ static int createArrayMenu(int size, const char menuEntries[][128], void(*menuFn
     return menuId;
 }
 /*
-    created adjust features  for light and ambiance 
-    possibly implment max/min ? 
+    created adjust features  for light and ambiance ,possibly implment max/min ? 
 */
 static void adjustAmbientDiffuse(vec2 ad)
 {
