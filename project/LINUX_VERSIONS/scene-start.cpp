@@ -78,6 +78,8 @@ int nObjects = 0;    // How many objects are currenly in the scene.
 int currObject = -1; // The current object
 int toolObj = -1;    // The object currently being modified
 
+int noOfNonObjectElements = 2         ;      // Jainish - Increment this value for second light source addition 
+
 //----------------------------------------------------------------------------
 //
 // Loads a texture by number, and binds it for later use.    
@@ -493,6 +495,22 @@ static int createArrayMenu(int size, const char menuEntries[][128], void(*menuFn
     }
     return menuId;
 }
+
+static void deleteObject(int cO) // cO ==  current Object -> Part  J  - JAINISH 
+{
+    // index 0 = ground 
+    // index 1 = 1st light source 
+    // index 2 = 2nd light soruce 
+    // Only want to delete objects 
+    if(cO>noOfNonObjectElements-1)
+    {
+        nObjects--;
+        sceneObjs[cO]= sceneObjs[nObjects];
+        currObject --;
+    }
+ 
+}
+
 /*
     created adjust features  for light and ambiance ,possibly implment max/min ? 
 */
@@ -557,6 +575,7 @@ static void mainmenu(int id)
     if(id == 7){
         rippleEffect = !(rippleEffect);
     }
+    if(id == 8) deleteObject(currObject);
     if (id == 99) exit(0);
 }
 
@@ -587,7 +606,8 @@ static void makeMenu()
     glutAddSubMenu("Texture",texMenuId);
     glutAddSubMenu("Ground Texture",groundMenuId);
     glutAddSubMenu("Lights",lightMenuId);
-    glutAddMenuEntry("Toggle Earthquake", 7);
+    glutAddMenuEntry("Toggle Earthquake", 7); // PART j _RUAN 
+    glutAddMenuEntry("Delete Object",8);
     glutAddMenuEntry("EXIT", 99);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
