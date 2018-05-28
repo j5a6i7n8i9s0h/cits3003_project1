@@ -4,6 +4,8 @@
 #include <dirent.h>
 #include <time.h>
 
+#include <string> 
+
 // Open Asset Importer header files (in ../../assimp--3.0.1270/include)
 // This is a standard open source library for loading meshes, see gnatidread.h
 #include <assimp/cimport.h>
@@ -31,6 +33,9 @@ GLuint timeU;
 static float viewDist = 1.5; // Distance from the camera to the centre of the scene
 static float camRotSidewaysDeg=0; // rotates the camera sideways around the centre
 static float camRotUpAndOverDeg=20; // rotates the camera up and over the centre.
+//Important
+string baseSaveName = "savefile"
+final static int numOfSaves =10;
 
 
 mat4 projection; // Projection matrix - set in the reshape function
@@ -257,7 +262,7 @@ static void addObject(int id)
     sceneObjs[nObjects].rgb[2] = 0.7; sceneObjs[nObjects].brightness = 1.0;
 
     sceneObjs[nObjects].diffuse = 1.0; sceneObjs[nObjects].specular = 0.5;
-    sceneObjs[nObjects].ambient = 0.1; sceneObjs[nObjects].shine = 10.0;   /// ambient = 0.7
+    sceneObjs[nObjects].ambient = 0.7; sceneObjs[nObjects].shine = 10.0;   /// ambient = 0.7
 
     sceneObjs[nObjects].angles[0] = 0.0; sceneObjs[nObjects].angles[1] = 180.0;
     sceneObjs[nObjects].angles[2] = 0.0;
@@ -275,7 +280,7 @@ static void addObject(int id)
 //------The init function-----------------------------------------------------
 
 void init( void )
-{
+{    
     srand ( time(NULL) ); /* initialize random seed - so the starting scene varies */
     aiInit();
 
@@ -578,9 +583,36 @@ static void mainmenu(int id)
     if(id == 8) deleteObject(currObject);
     if (id == 99) exit(0);
 }
+static void saveSceneToFile(int id)
+{
+
+}
+static void loadScenceFromFile(int id)
+{
+	FILE *loadfile = fopen(baseSaveName + to_string(id),"r");
+	if(file!=NULL)
+	{	
+	}
+	else
+	{
+	fclose(loadfile);
+	fprintf(stderr,"Error for loading file %s", baseSaveName + to_string(id));
+	return;
+	}
+	
+	fclose(loadfile);
+}
 
 static void makeMenu()
 {
+   	char saveloadentitiynames[numOfSaves][128];
+	for(int i=1;i<=numOfSaves; i++) 
+	{
+		 sprintf(saveloadentitiynames[i-1][128],"Save-slot %d", i);
+	}
+
+	int loadMenuID = createArrayMenu(numOfSaves,saveloadentitiynames,);
+	int SaveMenuID = createArrayMenu(numOfSaves,saveloadentitiynames,);
     int objectId = createArrayMenu(numMeshes, objectMenuEntries, objectMenu);
 
     int materialMenuId = glutCreateMenu(materialMenu);
@@ -597,7 +629,14 @@ static void makeMenu()
     glutAddMenuEntry("Move Light 2",80);
     glutAddMenuEntry("R/G/B/All Light 2",81);
 
+  /*  int SaveLoadMenuID = glutCreateMenu(SaveLoadMenu);
+    glutAddMenuEntry("Save",101);
+    glutAddMenuEntry("Load",102);
+*/
     glutCreateMenu(mainmenu);
+ //glutAddSubMenu("Save/Load Scene",SaveLoadMenuID);
+    glutAddMenuEntry("Save current scene",loadMenuID);
+    glutAddMenuEntry ("Load another scene" , 
     glutAddMenuEntry("Rotate/Move Camera",50);
     glutAddSubMenu("Add object", objectId);
     glutAddMenuEntry("Position/Scale", 41);
@@ -607,7 +646,7 @@ static void makeMenu()
     glutAddSubMenu("Ground Texture",groundMenuId);
     glutAddSubMenu("Lights",lightMenuId);
     glutAddMenuEntry("Toggle Earthquake", 7); // PART j _RUAN 
-    glutAddMenuEntry("Delete Object",8);
+    glutAddMenuEntry("Delete Object",8); 
     glutAddMenuEntry("EXIT", 99);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
