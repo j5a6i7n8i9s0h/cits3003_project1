@@ -4,7 +4,7 @@
 #include <dirent.h>
 #include <time.h>
 
-#include <string> 
+#include <string>
 
 // Open Asset Importer header files (in ../../assimp--3.0.1270/include)
 // This is a standard open source library for loading meshes, see gnatidread.h
@@ -34,10 +34,8 @@ static float viewDist = 1.5; // Distance from the camera to the centre of the sc
 static float camRotSidewaysDeg=0; // rotates the camera sideways around the centre
 static float camRotUpAndOverDeg=20; // rotates the camera up and over the centre.
 //Important
-string baseSaveName = "savefile"
-final static int numOfSaves =10;
 
-static int totalSlotEntries=10;
+const int totalSlotEntries=10;
 
 mat4 projection; // Projection matrix - set in the reshape function
 mat4 view; // View matrix - set in the display function.
@@ -83,9 +81,6 @@ SceneObject sceneObjs[maxObjects]; // An array storing the objects currently in 
 int nObjects = 0;    // How many objects are currenly in the scene.
 int currObject = -1; // The current object
 int toolObj = -1;    // The object currently being modified
-
-int noOfNonObjectElements = 2         ;      // Jainish - Increment this value for second light source addition
-
 //----------------------------------------------------------------------------
 //
 // Loads a texture by number, and binds it for later use.
@@ -281,7 +276,7 @@ static void addObject(int id)
 //------The init function-----------------------------------------------------
 
 void init( void )
-{    
+{
     srand ( time(NULL) ); /* initialize random seed - so the starting scene varies */
     aiInit();
 
@@ -553,7 +548,7 @@ static void materialMenu(int id)
                          adjustBlueBrightness, mat2(1, 0, 0, 1) );
     }
     //Part C
-    else if(id==20)
+    else if(id==201)
     {
         toolObj = currObject;
         setToolCallbacks(adjustAmbientDiffuse, mat2(1, 0, 0, 1),
@@ -600,72 +595,83 @@ static void mainmenu(int id)
 
 static void SaveScene(int id)
 {
+  deactivateTool();
+  cout << "GOT HERE"<<" "<<id<<endl;
   char filename[50];
-  if(sprintf(filename, "SlotEntry%d",id) <0) fprintf(stderr, "%s%d\n", "Error saving slot entry for slot ",id);
-  FILE * slotfile = fopen(filename,"w+");
+  if(sprintf(filename, "SlotEntry%d.txt",id+1) <0) fprintf(stderr, "%s%d\n", "Error saving slot entry for slot %d",id);
+  FILE * slotfile = fopen(filename,"wb+");
   if(slotfile!=NULL)
   {
-    // do shit here 
-    fwrite();
-    fwrite()
+    // fwrite (void* of data, size*t , int, FILE* ) general layyout
+    fwrite(sceneObjs,sizeof(SceneObject),nObjects,slotfile);
+    fwrite(&viewDist,sizeof(float),1,slotfile);
+    fwrite(&camRotSidewaysDeg,sizeof(float),1,slotfile);
+    fwrite(&camRotUpAndOverDeg,sizeof(float),1,slotfile);
+    fwrite(&rippleEffect,sizeof(bool),1,slotfile);
+    fwrite(&currObject,sizeof(int),1,slotfile);
+    fwrite(&nObjects,sizeof(int),1,slotfile);
+    fflush(slotfile);
   }
   else
   {
-
+    fprintf(stderr, "%s%d\n", "Error saving slot entry for slot %d",id);
   }
   fclose(slotfile);
-  //
-
-static void loadScenceFromFile(int id)
-{
-	FILE *loadfile = fopen(baseSaveName + to_string(id),"r");
-	if(file!=NULL)
-	{	
-	}
-	else
-	{
-	fclose(loadfile);
-	fprintf(stderr,"Error for loading file %s", baseSaveName + to_string(id));
-	return;
-	}
-	
-	fclose(loadfile);
 }
-
-static void LoadScene(int id)
-{
-  char filename[50];
-  if(sprintf(filename, "SlotEntry%d",id) <0) fprintf(stderr, "%s%d\n", "Error creating slot entry for slot ",id);
   //
+ static void LoadScene(int id)
+{
+  deactivateTool();
+  cout << "THERE"<<" "<<id<<endl;
+  char filename[50];
+  if(sprintf(filename, "SlotEntry%d.txt",id) <0) fprintf(stderr, "%s%d\n", "Error loading slot entry for slot %d",id);
+  FILE * slotfile = fopen(filename,"rb");
+  if(slotfile!=NULL)
+  {
+    // fwrite (void* of data, size*t , int, FILE* ) general layyout
+    fread(sceneObjs,sizeof(SceneObject),nObjects,slotfile);
+    fread(&viewDist,sizeof(float),1,slotfile);
+    fread(&camRotSidewaysDeg,sizeof(float),1,slotfile);
+    fread(&camRotUpAndOverDeg,sizeof(float),1,slotfile);
+    fread(&rippleEffect,sizeof(bool),1,slotfile);
+    fread(&currObject,sizeof(int),1,slotfile);
+    fread(&nObjects,sizeof(int),1,slotfile);
+  }
+  else
+  {
+    fprintf(stderr, "%s%d\n", "Error loading slot entry for slot %d",id);
+  }
+  fclose(slotfile);
 }
 //ASD
 static void makeMenu()
 {
-   	char saveloadentitiynames[numOfSaves][128];
-	for(int i=1;i<=numOfSaves; i++) 
-	{
-		 sprintf(saveloadentitiynames[i-1][128],"Save-slot %d", i);
-	}
-
-	int loadMenuID = createArrayMenu(numOfSaves,saveloadentitiynames,);
-	int SaveMenuID = createArrayMenu(numOfSaves,saveloadentitiynames,);
     int objectId = createArrayMenu(numMeshes, objectMenuEntries, objectMenu);
-    char AllSlotEntries[totalSlotEntries][128];
-    for(int i=0;i<totalSlotEntries;i++)
+    // char AllSlotEntries[totalSlotEntries][128];
+    // for(int i=0;i<totalSlotEntries;i++)
+    // {
+    //    if(sprintf(AllSlotEntries[i], "%s%d", "SlotEntry",i) <0) fprintf(stderr, "%s\n", "Error make slot entries");
+    //    cout << AllSlotEntries[i] <<endl;
+    // }
+    char saveMenuEntries[totalSlotEntries][128];
+    for(int i=0; i < totalSlotEntries; i++)
     {
-       if(sprintf(AllSlotEntries[i], "%s%d", "SlotEntry",i+1) <0) fprintf(stderr, "%s\n", "Error make slot entries");
+      sprintf( saveMenuEntries[i], "SlotEntry #%d", i + 1);
     }
+    int SaveSceneID = createArrayMenu(totalSlotEntries, saveMenuEntries, SaveScene);
+    int LoadSceneID = createArrayMenu(totalSlotEntries, saveMenuEntries, LoadScene);
 
-    int SaveSceneID = createArrayMenu(totalSlotEntries,AllSlotEntries,SaveScene);
-    int LoadSceneID = createArrayMenu(totalSlotEntries,AllSlotEntries,LoadScene);
+
 
     int materialMenuId = glutCreateMenu(materialMenu);
     glutAddMenuEntry("R/G/B/All",10);
-    glutAddMenuEntry("Ambient/Diffuse/Specular/Shine",20); // id for glutmenuentry // IMPLEMENTED C
+    glutAddMenuEntry("Ambient/Diffuse/Specular/Shine",201); // id for glutmenuentry // IMPLEMENTED C // for
 
     int texMenuId = createArrayMenu(numTextures, textureMenuEntries, texMenu);
     int groundMenuId = createArrayMenu(numTextures, textureMenuEntries, groundMenu);
-
+    // int SaveSceneID = createArrayMenu(totalSlotEntries,AllSlotEntries,SaveScene);
+    // int LoadSceneID = createArrayMenu(totalSlotEntries,AllSlotEntries,LoadScene);
+    cout << "HELL WORD " << SaveSceneID<< " "<< LoadSceneID<<endl;
 
 
     int lightMenuId = glutCreateMenu(lightMenu);
@@ -681,8 +687,6 @@ static void makeMenu()
 */
     glutCreateMenu(mainmenu);
  //glutAddSubMenu("Save/Load Scene",SaveLoadMenuID);
-    glutAddMenuEntry("Save current scene",loadMenuID);
-    glutAddMenuEntry ("Load another scene" , 
     glutAddMenuEntry("Rotate/Move Camera",50);
     glutAddSubMenu("Add object", objectId);
     glutAddMenuEntry("Position/Scale", 41);
@@ -693,8 +697,10 @@ static void makeMenu()
     glutAddSubMenu("Lights",lightMenuId);
     glutAddMenuEntry("Toggle Earthquake", 7); // PART j _RUAN
     glutAddMenuEntry("Delete Object",8);
-    glutAddMenuEntry("Save Scene", 101);
-    glutAddMenuEntry("Load another scene",102);
+
+    glutAddSubMenu("Save scene", SaveSceneID);
+    glutAddSubMenu("Load another scene",LoadSceneID);
+
     glutAddMenuEntry("EXIT", 99);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
