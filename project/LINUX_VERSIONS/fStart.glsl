@@ -10,6 +10,9 @@ uniform mat4 Projection;
 uniform vec4 LightPosition;
 uniform float Shininess;
 
+
+uniform vec4 LightPosition2;    //light source2 
+
 varying vec3 fN;
 varying vec3 fL;
 varying vec3 fE;
@@ -21,7 +24,15 @@ void main()
     vec3 E = normalize(fE);
     vec3 L = normalize(fL);
 
+    //light source 2 
+    vec3 L2 = normalize(LightPosition2.xyz);
+
+
     vec3 H = normalize(L+E);
+    
+    // Light source 2 
+    vec3 H2 = normalize(L2 + E);
+
 
     vec3 Lvec = LightPosition.xyz - pos;
     float distance = length(Lvec);
@@ -33,6 +44,9 @@ void main()
 
     float Kd = max( dot(L, N), 0.0 );
     vec3  diffuse = Kd*DiffuseProduct* distanceFactor;
+
+    float Kd2 = max( dot(L2,N),0.0);
+    
 
     float Ks = pow( max(dot(N, H), 0.0), Shininess );
     vec3  specular = Ks * SpecularProduct * distanceFactor;

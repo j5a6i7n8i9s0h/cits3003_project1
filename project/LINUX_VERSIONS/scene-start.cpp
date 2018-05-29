@@ -18,7 +18,7 @@ GLint windowHeight=640, windowWidth=960;
 #include "gnatidread.h"
 
 
-using namespace std;        // Import the C++ standard functions (e.g., min) 
+using namespace std;        // Import the C++ standard functions (e.g., min)
 
 
 // IDs for the GLSL program and GLSL variables.
@@ -32,6 +32,7 @@ static float viewDist = 1.5; // Distance from the camera to the centre of the sc
 static float camRotSidewaysDeg=0; // rotates the camera sideways around the centre
 static float camRotUpAndOverDeg=20; // rotates the camera up and over the centre.
 
+static int totalSlotEntries=10;
 
 mat4 projection; // Projection matrix - set in the reshape function
 mat4 view; // View matrix - set in the display function.
@@ -40,7 +41,7 @@ bool rippleEffect = false; //to toggle ripple effect for question J
 
 // These are used to set the window title
 char lab[] = "Project1";
-char *programName = NULL; // Set in main 
+char *programName = NULL; // Set in main
 int numDisplayCalls = 0; // Used to calculate the number of frames per second
 
 //------Meshes----------------------------------------------------------------
@@ -78,11 +79,11 @@ int nObjects = 0;    // How many objects are currenly in the scene.
 int currObject = -1; // The current object
 int toolObj = -1;    // The object currently being modified
 
-int noOfNonObjectElements = 2         ;      // Jainish - Increment this value for second light source addition 
+int noOfNonObjectElements = 2         ;      // Jainish - Increment this value for second light source addition
 
 //----------------------------------------------------------------------------
 //
-// Loads a texture by number, and binds it for later use.    
+// Loads a texture by number, and binds it for later use.
 void loadTextureIfNotAlreadyLoaded(int i)
 {
     if (textures[i] != NULL) return; // The texture is already loaded.
@@ -107,8 +108,8 @@ void loadTextureIfNotAlreadyLoaded(int i)
 
 //------Mesh loading----------------------------------------------------------
 //
-// The following uses the Open Asset Importer library via loadMesh in 
-// gnatidread.h to load models in .x format, including vertex positions, 
+// The following uses the Open Asset Importer library via loadMesh in
+// gnatidread.h to load models in .x format, including vertex positions,
 // normals, and texture coordinates.
 // You shouldn't need to modify this - it's called from drawMesh below.
 
@@ -136,7 +137,7 @@ void loadMeshIfNotAlreadyLoaded(int meshNumber)
                   NULL, GL_STATIC_DRAW );
 
     int nVerts = mesh->mNumVertices;
-    // Next, we load the position and texCoord data in parts.    
+    // Next, we load the position and texCoord data in parts.
     glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(float)*3*nVerts, mesh->mVertices );
     glBufferSubData( GL_ARRAY_BUFFER, sizeof(float)*3*nVerts, sizeof(float)*3*nVerts, mesh->mTextureCoords[0] );
     glBufferSubData( GL_ARRAY_BUFFER, sizeof(float)*6*nVerts, sizeof(float)*3*nVerts, mesh->mNormals);
@@ -154,7 +155,7 @@ void loadMeshIfNotAlreadyLoaded(int meshNumber)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferId[0]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * mesh->mNumFaces * 3, elements, GL_STATIC_DRAW);
 
-    // vPosition it actually 4D - the conversion sets the fourth dimension (i.e. w) to 1.0                 
+    // vPosition it actually 4D - the conversion sets the fourth dimension (i.e. w) to 1.0
     glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
     glEnableVertexAttribArray( vPosition );
 
@@ -216,7 +217,7 @@ static void adjustcamSideUp(vec2 su)
     //cout << su << endl;
     camRotSidewaysDeg+=su[0]; camRotUpAndOverDeg+=su[1];
 }
-    
+
 static void adjustLocXZ(vec2 xz)
 {
     sceneObjs[toolObj].loc[0]+=xz[0]; sceneObjs[toolObj].loc[2]+=xz[1];
@@ -238,7 +239,7 @@ static void doRotate()
     setToolCallbacks(adjustCamrotsideViewdist, mat2(400,0,0,-2),
                      adjustcamSideUp, mat2(400, 0, 0,-90) );
 }
-                                     
+
 //------Add an object to the scene--------------------------------------------
 
 static void addObject(int id)
@@ -257,7 +258,7 @@ static void addObject(int id)
     sceneObjs[nObjects].rgb[2] = 0.7; sceneObjs[nObjects].brightness = 1.0;
 
     sceneObjs[nObjects].diffuse = 1.0; sceneObjs[nObjects].specular = 0.5;
-    sceneObjs[nObjects].ambient = 0.1; sceneObjs[nObjects].shine = 10.0;   /// ambient = 0.7
+    sceneObjs[nObjects].ambient = 0.7; sceneObjs[nObjects].shine = 10.0;   /// ambient = 0.7
 
     sceneObjs[nObjects].angles[0] = 0.0; sceneObjs[nObjects].angles[1] = 180.0;
     sceneObjs[nObjects].angles[2] = 0.0;
@@ -290,11 +291,11 @@ void init( void )
 
     glUseProgram( shaderProgram ); CheckError();
 
-    // Initialize the vertex position attribute from the vertex shader        
+    // Initialize the vertex position attribute from the vertex shader
     vPosition = glGetAttribLocation( shaderProgram, "vPosition" );
     vNormal = glGetAttribLocation( shaderProgram, "vNormal" ); CheckError();
 
-    // Likewise, initialize the vertex texture coordinates attribute.    
+    // Likewise, initialize the vertex texture coordinates attribute.
     vTexCoord = glGetAttribLocation( shaderProgram, "vTexCoord" );
     CheckError();
 
@@ -315,6 +316,15 @@ void init( void )
     sceneObjs[1].scale = 0.1;
     sceneObjs[1].texId = 0; // Plain texture
     sceneObjs[1].brightness = 0.2; // The light's brightness is 5 times this (below).
+
+
+    //PART I - SECOND LIGHT
+    addObject(55);
+    sceneObjs[2].loc = vec4(2.0,-2.0,-1.0,1.0);
+    sceneObjs[2].scale = 0.2;
+    sceneObjs[2].texId = 0; // Plain texture
+    sceneObjs[2].brightness = 0.2; // The light's brightness is 5 times this (below).
+
 
     addObject(rand() % numMeshes); // A test mesh
 
@@ -386,12 +396,16 @@ void display( void )
 
     view =  Translate(0.0, 0.0, -viewDist) * RotateX(camRotUpAndOverDeg)*RotateY(camRotSidewaysDeg);
 
-    SceneObject lightObj1 = sceneObjs[1]; 
+    SceneObject lightObj1 = sceneObjs[1];
     vec4 lightPosition = view * lightObj1.loc ;
+
+    //PART I - Second Light Source
 
     glUniform4fv( glGetUniformLocation(shaderProgram, "LightPosition"),
                   1, lightPosition);
     CheckError();
+    // PART I
+  //  glUniform4fv(glGetUniformLocation(shaderProgram,"LightPosition2"),1,lightPostion2)
 
     for (int i=0; i < nObjects; i++) {
         SceneObject so = sceneObjs[i];
@@ -496,23 +510,23 @@ static int createArrayMenu(int size, const char menuEntries[][128], void(*menuFn
     return menuId;
 }
 
-static void deleteObject(int cO) // cO ==  current Object -> Part  J  - JAINISH 
+static void deleteObject(int cO) // cO ==  current Object -> Part  J  - JAINISH
 {
-    // index 0 = ground 
-    // index 1 = 1st light source 
-    // index 2 = 2nd light soruce 
-    // Only want to delete objects 
-    if(cO>noOfNonObjectElements-1)
+    // index 0 = ground
+    // index 1 = 1st light source
+    // index 2 = 2nd light soruce
+    // Only want to delete objects
+    if(cO>2)
     {
         nObjects--;
         sceneObjs[cO]= sceneObjs[nObjects];
-        currObject --;
+        currObject--;
     }
- 
+
 }
 
 /*
-    created adjust features  for light and ambiance ,possibly implment max/min ? 
+    created adjust features  for light and ambiance ,possibly implment max/min ?
 */
 static void adjustAmbientDiffuse(vec2 ad)
 {
@@ -540,7 +554,7 @@ static void materialMenu(int id)
         setToolCallbacks(adjustAmbientDiffuse, mat2(1, 0, 0, 1),
                          adjustSpecularShine, mat2(1, 0, 0, 1) );
     }
-    // You'll need to fill in the remaining menu items here.                                                
+    // You'll need to fill in the remaining menu items here.
     else {
         printf("Error in materialMenu\n");
     }
@@ -578,24 +592,59 @@ static void mainmenu(int id)
     if(id == 8) deleteObject(currObject);
     if (id == 99) exit(0);
 }
+static void SaveScene(int id)
+{
+  char filename[50];
+  if(sprintf(filename, "SlotEntry%d",id) <0) fprintf(stderr, "%s%d\n", "Error saving slot entry for slot ",id);
+  FILE * slotfile = fopen(filename,"w+");
+  if(slotfile!=NULL)
+  {
+    // do shit here 
+    fwrite();
+    fwrite()
+  }
+  else
+  {
 
+  }
+  fclose(slotfile);
+  //
+}
+
+static void LoadScene(int id)
+{
+  char filename[50];
+  if(sprintf(filename, "SlotEntry%d",id) <0) fprintf(stderr, "%s%d\n", "Error creating slot entry for slot ",id);
+  //
+}
+//ASD
 static void makeMenu()
 {
     int objectId = createArrayMenu(numMeshes, objectMenuEntries, objectMenu);
+    char AllSlotEntries[totalSlotEntries][128];
+    for(int i=0;i<totalSlotEntries;i++)
+    {
+       if(sprintf(AllSlotEntries[i], "%s%d", "SlotEntry",i+1) <0) fprintf(stderr, "%s\n", "Error make slot entries");
+    }
+
+    int SaveSceneID = createArrayMenu(totalSlotEntries,AllSlotEntries,SaveScene);
+    int LoadSceneID = createArrayMenu(totalSlotEntries,AllSlotEntries,LoadScene);
 
     int materialMenuId = glutCreateMenu(materialMenu);
     glutAddMenuEntry("R/G/B/All",10);
-    glutAddMenuEntry("Ambient/Diffuse/Specular/Shine",20); // id for glutmenuentry // IMPLEMENTED C 
+    glutAddMenuEntry("Ambient/Diffuse/Specular/Shine",20); // id for glutmenuentry // IMPLEMENTED C
 
     int texMenuId = createArrayMenu(numTextures, textureMenuEntries, texMenu);
     int groundMenuId = createArrayMenu(numTextures, textureMenuEntries, groundMenu);
-    //int currentObjectId = createArrayMenu(nObjects, )
+
+
 
     int lightMenuId = glutCreateMenu(lightMenu);
     glutAddMenuEntry("Move Light 1",70);
     glutAddMenuEntry("R/G/B/All Light 1",71);
     glutAddMenuEntry("Move Light 2",80);
     glutAddMenuEntry("R/G/B/All Light 2",81);
+    //int currentObjectId = createArrayMenu(nObjects,)
 
     glutCreateMenu(mainmenu);
     glutAddMenuEntry("Rotate/Move Camera",50);
@@ -606,8 +655,10 @@ static void makeMenu()
     glutAddSubMenu("Texture",texMenuId);
     glutAddSubMenu("Ground Texture",groundMenuId);
     glutAddSubMenu("Lights",lightMenuId);
-    glutAddMenuEntry("Toggle Earthquake", 7); // PART j _RUAN 
+    glutAddMenuEntry("Toggle Earthquake", 7); // PART j _RUAN
     glutAddMenuEntry("Delete Object",8);
+    glutAddMenuEntry("Save Scene", 101);
+    glutAddMenuEntry("Load another scene",102);
     glutAddMenuEntry("EXIT", 99);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
@@ -641,8 +692,8 @@ void reshape( int width, int height )
 
     // You'll need to modify this so that the view is similar to that in the
     // sample solution.
-    // In particular: 
-    //     - the view should include "closer" visible objects (slightly tricky) 
+    // In particular:
+    //     - the view should include "closer" visible objects (slightly tricky)
     //     - when the width is less than the height, the view should adjust so
     //         that the same part of the scene is visible across the width of
     //         the window.
@@ -659,7 +710,7 @@ void reshape( int width, int height )
                          nearDist*(float)height/(float)width,
                          nearDist, 100.0);
     }
-    
+
 }
 
 //----------------------------------------------------------------------------
@@ -732,7 +783,7 @@ int main( int argc, char* argv[] )
     glutMouseFunc( mouseClickOrScroll );
     glutPassiveMotionFunc(mousePassiveMotion);
     glutMotionFunc( doToolUpdateXY );
- 
+
     glutReshapeFunc( reshape );
     glutTimerFunc( 1000, timer, 1 );
     CheckError();
