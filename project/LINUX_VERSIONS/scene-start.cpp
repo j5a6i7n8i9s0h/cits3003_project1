@@ -598,8 +598,10 @@ static void SaveScene(int id)
   deactivateTool();
   cout << "GOT HERE"<<" "<<id<<endl;
   char filename[50];
-  if(sprintf(filename, "SlotEntry%d.txt",id+1) <0) fprintf(stderr, "%s%d\n", "Error saving slot entry for slot %d",id);
+  if(sprintf(filename, "SlotEntry%d",id) <0) fprintf(stderr, "%s%d\n", "Error saving slot entry for slot %d",id);
+ 	remove(filename);	// remove needed as without it seg fault arises when opening a overwritten saved file 	
   FILE * slotfile = fopen(filename,"wb+");
+  printf("%s\n",filename);
   if(slotfile!=NULL)
   {
     // fwrite (void* of data, size*t , int, FILE* ) general layyout
@@ -610,7 +612,7 @@ static void SaveScene(int id)
     fwrite(&rippleEffect,sizeof(bool),1,slotfile);
     fwrite(&currObject,sizeof(int),1,slotfile);
     fwrite(&nObjects,sizeof(int),1,slotfile);
-    fflush(slotfile);
+    //fflush(slotfile);
   }
   else
   {
@@ -624,7 +626,7 @@ static void SaveScene(int id)
   deactivateTool();
   cout << "THERE"<<" "<<id<<endl;
   char filename[50];
-  if(sprintf(filename, "SlotEntry%d.txt",id) <0) fprintf(stderr, "%s%d\n", "Error loading slot entry for slot %d",id);
+  if(sprintf(filename, "SlotEntry%d",id) <0) fprintf(stderr, "%s%d\n", "Error loading slot entry for slot %d",id);
   FILE * slotfile = fopen(filename,"rb");
   if(slotfile!=NULL)
   {
@@ -636,12 +638,11 @@ static void SaveScene(int id)
     fread(&rippleEffect,sizeof(bool),1,slotfile);
     fread(&currObject,sizeof(int),1,slotfile);
     fread(&nObjects,sizeof(int),1,slotfile);
-  }
+  }  
   else
   {
     fprintf(stderr, "%s%d\n", "Error loading slot entry for slot %d",id);
   }
-  fclose(slotfile);
 }
 //ASD
 static void makeMenu()
