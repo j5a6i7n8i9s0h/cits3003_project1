@@ -35,6 +35,7 @@ static float camRotSidewaysDeg=0; // rotates the camera sideways around the cent
 static float camRotUpAndOverDeg=20; // rotates the camera up and over the centre.
 //Important
 
+const int LastIndexOfNonDeletableObject = 2;
 const int totalSlotEntries=10;
 
 mat4 projection; // Projection matrix - set in the reshape function
@@ -398,11 +399,15 @@ void display( void )
 
     SceneObject lightObj1 = sceneObjs[1];
     vec4 lightPosition = view * lightObj1.loc ;
+    // second light
+    SceneObject lightObj2 = sceneObjs[2];
+    vec4 lightPosition2 = view * lightObj2.loc ;
 
     //PART I - Second Light Source
 
-    glUniform4fv( glGetUniformLocation(shaderProgram, "LightPosition"),
-                  1, lightPosition);
+    glUniform4fv( glGetUniformLocation(shaderProgram, "LightPosition"),1, lightPosition);
+    CheckError();
+    glUniform4fv( glGetUniformLocation(shaderProgram, "LightPosition2"),1, lightPosition2);
     CheckError();
     // PART I
   //  glUniform4fv(glGetUniformLocation(shaderProgram,"LightPosition2"),1,lightPostion2)
@@ -516,7 +521,7 @@ static void deleteObject(int cO) // cO ==  current Object -> Part  J  - JAINISH
     // index 1 = 1st light source
     // index 2 = 2nd light soruce
     // Only want to delete objects
-    if(cO>2)
+    if(cO>LastIndexOfNonDeletableObject)
     {
         nObjects--;
         sceneObjs[cO]= sceneObjs[nObjects];
@@ -590,6 +595,19 @@ static void mainmenu(int id)
         rippleEffect = !(rippleEffect);
     }
     if(id == 8) deleteObject(currObject);
+    if(id == 9 ) // next 
+    {
+    	if(currObject<maxObjects-1 && currObject+1 < nObjects)
+    		currObject++;
+    	toolObj= currObject;
+
+    }
+    if(id == 10) // previous
+    {
+    	if(currObject>LastIndexOfNonDeletableObject+1)
+    		currObject--;
+    	toolObj= currObject;
+    }
     if (id == 99) exit(0);
 }
 
@@ -673,7 +691,6 @@ static void makeMenu()
     int groundMenuId = createArrayMenu(numTextures, textureMenuEntries, groundMenu);
     // int SaveSceneID = createArrayMenu(totalSlotEntries,AllSlotEntries,SaveScene);
     // int LoadSceneID = createArrayMenu(totalSlotEntries,AllSlotEntries,LoadScene);
-    cout << "HELL WORD " << SaveSceneID<< " "<< LoadSceneID<<endl;
 
 
     int lightMenuId = glutCreateMenu(lightMenu);
@@ -697,8 +714,12 @@ static void makeMenu()
     glutAddSubMenu("Texture",texMenuId);
     glutAddSubMenu("Ground Texture",groundMenuId);
     glutAddSubMenu("Lights",lightMenuId);
+    // added functionalities 
     glutAddMenuEntry("Toggle Earthquake", 7); // PART j _RUAN
-    glutAddMenuEntry("Delete Object",8);
+    glutAddMenuEntry("Next Object",9);		// cycle through which obbject to delete 
+    glutAddMenuEntry("Delete current Object",8);
+    glutAddMenuEntry("Previous Object",10); // cycle through which obbject to delete 
+
 
     glutAddSubMenu("Save scene", SaveSceneID);
     glutAddSubMenu("Load another scene",LoadSceneID);
