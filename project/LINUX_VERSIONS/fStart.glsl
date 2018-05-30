@@ -1,4 +1,4 @@
-//varying vec4 color;
+varying vec4 color;
 varying vec2 texCoord;  // The third coordinate is always 0.0 and is discarded
 varying vec3 pos;
 
@@ -7,14 +7,14 @@ uniform sampler2D texture;
 uniform vec3 AmbientProduct, DiffuseProduct, SpecularProduct;
 uniform mat4 ModelView;
 uniform mat4 Projection;
-uniform vec4 LightPosition;
+uniform vec4 LightPosition,LightPosition2;
 uniform float Shininess;
 
+//uniform float LightBrightness, LightBrightness2;
 
-uniform vec4 LightPosition2;    //light source2 
 
 varying vec3 fN;
-varying vec3 fL;
+varying vec3 fL,fL2;
 varying vec3 fE;
 
 
@@ -24,8 +24,7 @@ void main()
     vec3 E = normalize(fE);
     vec3 L = normalize(fL);
 
-    //light source 2 
-    vec3 L2 = normalize(LightPosition2.xyz);
+    vec3 L2 = normalize(fL2);
 
 
     vec3 H = normalize(L+E);
@@ -49,12 +48,18 @@ void main()
     
 
     float Ks = pow( max(dot(N, H), 0.0), Shininess );
+    float Ks2 =pow( max(dot(N, H2), 0.0), Shininess );
+
     vec3  specular = Ks * SpecularProduct * distanceFactor;
+    vec3 specular2 = Ks2 * SpecularProduct*distanceFactor;
 
     if (dot(L, N) < 0.0 ) {
 	    specular = vec3(0.0, 0.0, 0.0);
     } // discard the specular if its behind the light
 
+    if (dot(L2, N) < 0.0 ) {
+        specular2 = vec3(0.0, 0.0, 0.0);
+    }
     vec3 globalAmbient = vec3(0.03, 0.03, 0.03);
 
     vec4 color;

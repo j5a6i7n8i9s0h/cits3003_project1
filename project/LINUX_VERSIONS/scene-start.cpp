@@ -321,7 +321,7 @@ void init( void )
 
     //PART I - SECOND LIGHT
     addObject(55);
-    sceneObjs[2].loc = vec4(2.0,-2.0,-1.0,1.0);
+    sceneObjs[2].loc = vec4(0.0,0.0,1.0,1.0);
     sceneObjs[2].scale = 0.2;
     sceneObjs[2].texId = 0; // Plain texture
     sceneObjs[2].brightness = 0.2; // The light's brightness is 5 times this (below).
@@ -409,9 +409,10 @@ void display( void )
     CheckError();
     glUniform4fv( glGetUniformLocation(shaderProgram, "LightPosition2"),1, lightPosition2);
     CheckError();
-    // PART I
-  //  glUniform4fv(glGetUniformLocation(shaderProgram,"LightPosition2"),1,lightPostion2)
 
+    	
+    // PART I
+  // 
     for (int i=0; i < nObjects; i++) {
         SceneObject so = sceneObjs[i];
 
@@ -487,10 +488,17 @@ static void lightMenu(int id)
         setToolCallbacks(adjustRedGreen, mat2(1.0, 0, 0, 1.0),
                          adjustBlueBrightness, mat2(1.0, 0, 0, 1.0) );
     }
+     else if (id == 80) {
+        toolObj = 2;
+        setToolCallbacks(adjustLocXZ, camRotZ(),
+                         adjustBrightnessY, mat2( 1.0, 0.0, 0.0, 10.0) );
+    }
     else {
         printf("Error in lightMenu\n");
         exit(1);
     }
+   
+
 }
 
 static int createArrayMenu(int size, const char menuEntries[][128], void(*menuFn)(int))
