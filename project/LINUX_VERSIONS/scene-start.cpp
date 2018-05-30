@@ -643,6 +643,7 @@ static void SaveScene(int id)
   {
     fprintf(stderr, "%s%d\n", "Error loading slot entry for slot %d",id);
   }
+  fclose(slotfile);
 }
 //ASD
 static void makeMenu()
