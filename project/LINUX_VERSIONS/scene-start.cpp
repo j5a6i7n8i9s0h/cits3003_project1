@@ -4,7 +4,7 @@
 #include <dirent.h>
 #include <time.h>
 
-#include <string>
+#include <unistd.h>
 
 // Open Asset Importer header files (in ../../assimp--3.0.1270/include)
 // This is a standard open source library for loading meshes, see gnatidread.h
@@ -530,10 +530,11 @@ static void deleteObject(int cO) // cO ==  current Object -> Part  J  - JAINISH
     // index 2 = 2nd light soruce
     // Only want to delete objects
     if(cO>LastIndexOfNonDeletableObject)
-    {
-        nObjects--;
-        sceneObjs[cO]= sceneObjs[nObjects];
+    {   
+        for(int i = cO; i <nObjects+cO; i ++)
+        	sceneObjs[i]=sceneObjs[i+1];
         currObject--;
+        nObjects--;
     }
 
 }
@@ -653,6 +654,10 @@ static void SaveScene(int id)
   cout << "THERE"<<" "<<id<<endl;
   char filename[50];
   if(sprintf(filename, "SlotEntry%d",id) <0) fprintf(stderr, "%s%d\n", "Error loading slot entry for slot %d",id);
+  if(access(filename, F_OK)<0)
+  {
+  	return;
+  }  // if file doesnt exist 
   FILE * slotfile = fopen(filename,"rb");
   if(slotfile!=NULL)
   {
@@ -671,16 +676,11 @@ static void SaveScene(int id)
   }
   fclose(slotfile);
 }
+
 //ASD
 static void makeMenu()
 {
     int objectId = createArrayMenu(numMeshes, objectMenuEntries, objectMenu);
-    // char AllSlotEntries[totalSlotEntries][128];
-    // for(int i=0;i<totalSlotEntries;i++)
-    // {
-    //    if(sprintf(AllSlotEntries[i], "%s%d", "SlotEntry",i) <0) fprintf(stderr, "%s\n", "Error make slot entries");
-    //    cout << AllSlotEntries[i] <<endl;
-    // }
     char saveMenuEntries[totalSlotEntries][128];
     for(int i=0; i < totalSlotEntries; i++)
     {
@@ -688,8 +688,6 @@ static void makeMenu()
     }
     int SaveSceneID = createArrayMenu(totalSlotEntries, saveMenuEntries, SaveScene);
     int LoadSceneID = createArrayMenu(totalSlotEntries, saveMenuEntries, LoadScene);
-
-
 
     int materialMenuId = glutCreateMenu(materialMenu);
     glutAddMenuEntry("R/G/B/All",10);
@@ -734,6 +732,7 @@ static void makeMenu()
 
     glutAddMenuEntry("EXIT", 99);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
+
 }
 
 //----------------------------------------------------------------------------

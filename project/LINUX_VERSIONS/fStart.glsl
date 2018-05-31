@@ -51,7 +51,6 @@ void main()
     float Ks2 =pow( max(dot(N, H2), 0.0), Shininess );
 
     vec3  specular = Ks * SpecularProduct * distanceFactor;
-    vec3 specular2 = Ks2 * SpecularProduct*distanceFactor;
 
     if (dot(L, N) < 0.0 ) {
 	    specular = vec3(0.0, 0.0, 0.0);
