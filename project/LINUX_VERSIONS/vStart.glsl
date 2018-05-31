@@ -22,8 +22,8 @@ varying vec3 fN;
 varying vec3 fE;
 varying vec3 fL,fL2;
 
-void main()
-{
+void main(
+){
     vec4 vpos = vec4(vPosition, 1.0);
 
     // Transform vertex position into eye coordinates
