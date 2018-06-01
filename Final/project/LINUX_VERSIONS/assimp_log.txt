@@ -30,12 +30,30 @@ Info,  T0: CalcTangentsProcess finished. Tangents have been calculated
 Info,  T0: JoinVerticesProcess finished | Verts in: 77848 out: 25832 | ~66.8%
 Info,  T0: Cache relevant are 6 meshes (38924 faces). Average output ACMR is 0.865096
 Info,  T0: Leaving post processing pipeline
-Info,  T0: Load models-textures/model17.x
+Info,  T0: Load models-textures/model21.x
 Info,  T0: Found a matching importer for this file format
 Info,  T0: Import root directory is 'models-textures/'
 Info,  T0: Entering post processing pipeline
 Info,  T0: Points: 0, Lines: 0, Triangles: 1, Polygons: 0 (Meshes, X = removed)
 Info,  T0: CalcTangentsProcess finished. Tangents have been calculated
-Info,  T0: JoinVerticesProcess finished | Verts in: 21597 out: 5804 | ~73.1%
-Info,  T0: Cache relevant are 1 meshes (7199 faces). Average output ACMR is 0.962078
+Info,  T0: JoinVerticesProcess finished | Verts in: 40404 out: 15193 | ~62.4%
+Info,  T0: Cache relevant are 1 meshes (13468 faces). Average output ACMR is 1.208197
+Info,  T0: Leaving post processing pipeline
+Info,  T0: Load models-textures/model45.x
+Info,  T0: Found a matching importer for this file format
+Info,  T0: Import root directory is 'models-textures/'
+Info,  T0: Entering post processing pipeline
+Info,  T0: Points: 0, Lines: 0, Triangles: 1, Polygons: 0 (Meshes, X = removed)
+Info,  T0: CalcTangentsProcess finished. Tangents have been calculated
+Info,  T0: JoinVerticesProcess finished | Verts in: 38079 out: 11325 | ~70.3%
+Info,  T0: Cache relevant are 1 meshes (12693 faces). Average output ACMR is 1.008509
+Info,  T0: Leaving post processing pipeline
+Info,  T0: Load models-textures/model5.x
+Info,  T0: Found a matching importer for this file format
+Info,  T0: Import root directory is 'models-textures/'
+Info,  T0: Entering post processing pipeline
+Info,  T0: Points: 0, Lines: 0, Triangles: 1, Polygons: 0 (Meshes, X = removed)
+Info,  T0: CalcTangentsProcess finished. Tangents have been calculated
+Info,  T0: JoinVerticesProcess finished | Verts in: 24600 out: 5964 | ~75.8%
+Info,  T0: Cache relevant are 1 meshes (8200 faces). Average output ACMR is 0.878902
 Info,  T0: Leaving post processing pipeline
