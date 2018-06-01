@@ -632,13 +632,14 @@ static void SaveScene(int id)
   if(slotfile!=NULL)
   {
     // fwrite (void* of data, size*t , int, FILE* ) general layyout
+
+    fwrite(&nObjects,sizeof(int),1,slotfile);
     fwrite(sceneObjs,sizeof(SceneObject),nObjects,slotfile);
     fwrite(&viewDist,sizeof(float),1,slotfile);
     fwrite(&camRotSidewaysDeg,sizeof(float),1,slotfile);
     fwrite(&camRotUpAndOverDeg,sizeof(float),1,slotfile);
     fwrite(&rippleEffect,sizeof(bool),1,slotfile);
     fwrite(&currObject,sizeof(int),1,slotfile);
-    fwrite(&nObjects,sizeof(int),1,slotfile);
     //fflush(slotfile);
   }
   else
@@ -662,13 +663,14 @@ static void SaveScene(int id)
   if(slotfile!=NULL)
   {
     // fwrite (void* of data, size*t , int, FILE* ) general layyout
+    
+    fread(&nObjects,sizeof(int),1,slotfile);
     fread(sceneObjs,sizeof(SceneObject),nObjects,slotfile);
     fread(&viewDist,sizeof(float),1,slotfile);
     fread(&camRotSidewaysDeg,sizeof(float),1,slotfile);
     fread(&camRotUpAndOverDeg,sizeof(float),1,slotfile);
     fread(&rippleEffect,sizeof(bool),1,slotfile);
     fread(&currObject,sizeof(int),1,slotfile);
-    fread(&nObjects,sizeof(int),1,slotfile);
   }  
   else
   {
